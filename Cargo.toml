@@ -1,6 +1,6 @@
 [package]
 name = "demtile"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "GSI（国土地理院）DEMタイルPNG画像から標高値を取得するRustライブラリ"
 authors = ["delihiros"]
