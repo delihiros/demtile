@@ -1,0 +1,41 @@
+name: Publish to crates.io
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no actual publish)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: crates-io-publish
+      url: https://crates.io/crates/demtile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Build and test
+        run: |
+          cargo build --release
+          cargo test --release
+      - name: Publish to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            cargo publish --dry-run
+          else
+            cargo publish --no-verify
+          fi
+        # 必要に応じて --allow-dirty 追加可
+        # --no-verify: テスト等は事前に済ませている前提
+    # Approvals required for this environment (set in repo settings)
